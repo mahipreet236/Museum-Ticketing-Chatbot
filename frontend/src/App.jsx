@@ -115,6 +115,24 @@ function App() {
     return endpointPath
   }, [])
 
+  const localBackendBase = useMemo(() => {
+    const customLocalBase = import.meta.env.VITE_LOCAL_BACKEND_URL?.trim()
+    return customLocalBase || 'http://localhost:4002'
+  }, [])
+
+  const resolveRequestUrls = (url) => {
+    if (!url?.startsWith('/')) {
+      return [url]
+    }
+
+    // In production, relative API URLs should be served via configured base URL.
+    if (!import.meta.env.DEV) {
+      return [url]
+    }
+
+    return [url, `${localBackendBase}${url}`]
+  }
+
   const startBookingFlow = async () => {
     setShowChatbot(true)
     setIsBooking(true)
@@ -291,11 +309,7 @@ function App() {
   }
 
   const postMessage = async (text) => {
-    const requestUrls = [apiUrl]
-
-    if (apiUrl.startsWith('/')) {
-      requestUrls.push(`http://localhost:4002${apiUrl}`)
-    }
+    const requestUrls = resolveRequestUrls(apiUrl)
 
     let lastError = null
 
@@ -325,15 +339,15 @@ function App() {
       }
     }
 
+    if (lastError?.message?.toLowerCase?.().includes('failed to fetch')) {
+      throw new Error('Unable to reach backend server. Verify VITE_API_BASE_URL and backend deployment URL.')
+    }
+
     throw lastError || new Error('Unable to reach backend server')
   }
 
   const postJsonWithFallback = async (url, body) => {
-    const requestUrls = [url]
-
-    if (url.startsWith('/')) {
-      requestUrls.push(`http://localhost:4002${url}`)
-    }
+    const requestUrls = resolveRequestUrls(url)
 
     let lastError = null
 
@@ -359,15 +373,15 @@ function App() {
       }
     }
 
+    if (lastError?.message?.toLowerCase?.().includes('failed to fetch')) {
+      throw new Error('Unable to reach backend server. Verify VITE_API_BASE_URL and backend deployment URL.')
+    }
+
     throw lastError || new Error('Unable to reach backend server')
   }
 
   const getJsonWithFallback = async (url) => {
-    const requestUrls = [url]
-
-    if (url.startsWith('/')) {
-      requestUrls.push(`http://localhost:4002${url}`)
-    }
+    const requestUrls = resolveRequestUrls(url)
 
     let lastError = null
 
@@ -384,6 +398,10 @@ function App() {
       } catch (error) {
         lastError = error
       }
+    }
+
+    if (lastError?.message?.toLowerCase?.().includes('failed to fetch')) {
+      throw new Error('Unable to reach backend server. Verify VITE_API_BASE_URL and backend deployment URL.')
     }
 
     throw lastError || new Error('Unable to reach backend server')
