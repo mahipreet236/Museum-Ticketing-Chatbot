@@ -1,0 +1,25 @@
+{
+  "name": "chatbot_backend",
+  "version": "1.0.0",
+  "description": "chatbot",
+  "keywords": [
+    "chatbot_app"
+  ],
+  "license": "ISC",
+  "author": "mahi",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.0",
+    "express": "^5.2.1",
+    "mongoose": "^9.3.3",
+    "nodemon": "^3.1.14",
+    "razorpay": "^2.9.6"
+  }
+}
