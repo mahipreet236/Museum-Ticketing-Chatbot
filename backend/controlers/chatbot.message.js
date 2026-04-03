@@ -165,7 +165,10 @@ export const Message = async (req, res) => {
             botMessage:botResponse
         }) 
     } catch (error) {
-        console.log("Message control error")
-        return res.status(500).json({ error: "Internal server error" })
+        console.error("Message controller error:", error)
+        return res.status(500).json({
+            error: "Internal server error",
+            details: process.env.NODE_ENV === "production" ? undefined : error.message,
+        })
     }
 }
